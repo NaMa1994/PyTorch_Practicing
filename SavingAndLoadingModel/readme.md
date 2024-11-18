@@ -1,3 +1,115 @@
+# Training a Model in PyTorch
+
+This guide explains the essential components of training a model in PyTorch, including the model, optimizer, loss function, gradient updates, and related concepts. The concepts are drawn from practical experience and insights gained from [this useful article by Jean Cochrane](https://jeancochrane.com/blog/pytorch-functional-api).
+
+---
+
+## Key Components of PyTorch Training
+
+1. **Model**:
+   - Represents the architecture of your neural network, implemented as a subclass of `torch.nn.Module`.
+   - Example:
+     ```python
+     class LinearRegressionTorch(nn.Module):
+         def __init__(self, input_size, output_size):
+             super(LinearRegressionTorch, self).__init__()
+             self.linear = nn.Linear(input_size, output_size)
+         
+         def forward(self, x):
+             return self.linear(x)
+     
+     model = LinearRegressionTorch(input_size=1, output_size=1)
+     ```
+
+2. **Optimizer**:
+   - Updates the model's parameters based on gradients computed during backpropagation.
+   - Common optimizers: `torch.optim.SGD`, `torch.optim.Adam`.
+   - Example:
+     ```python
+     optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
+     ```
+
+3. **Loss Function**:
+   - Measures the difference between the model's predictions and the true labels.
+   - Common loss functions: `torch.nn.MSELoss`, `torch.nn.CrossEntropyLoss`.
+   - Example:
+     ```python
+     loss_fun = nn.MSELoss()
+     ```
+
+4. **Gradient Update**:
+   - PyTorch computes gradients of the loss with respect to model parameters using `loss.backward()`.
+
+5. **Weight Update**:
+   - The optimizer updates the model's parameters using `optimizer.step()`.
+
+---
+
+## PyTorch Training Loop
+
+A standard PyTorch training loop follows these steps:
+
+1. **Forward Pass**:
+   - Pass inputs through the model to compute predictions.
+   - Example:
+     ```python
+     y_pred = model(X)
+     ```
+
+2. **Compute Loss**:
+   - Calculate the loss using the predictions and ground truth.
+   - Example:
+     ```python
+     loss = loss_fun(y_pred, y_true)
+     ```
+
+3. **Backpropagation**:
+   - Compute gradients using `loss.backward()`.
+   - Example:
+     ```python
+     loss.backward()
+     ```
+
+4. **Update Weights**:
+   - Use the optimizer to update the model's parameters.
+   - Example:
+     ```python
+     optimizer.step()
+     ```
+
+5. **Zero Gradients**:
+   - Clear previous gradients to prevent accumulation.
+   - Example:
+     ```python
+     optimizer.zero_grad()
+     ```
+
+### Complete Training Loop Example
+
+```python
+losses = []
+number_epochs = 1000
+
+for epoch in range(number_epochs):
+    # Forward pass
+    y_pred = model(X)
+
+    # Compute loss
+    loss = loss_fun(y_pred, y_true)
+    losses.append(loss.item())
+
+    # Backpropagation
+    optimizer.zero_grad()  # Clear old gradients
+    loss.backward()        # Compute gradients
+    optimizer.step()       # Update weights
+
+    # Print progress every 100 epochs
+    if epoch % 100 == 0:
+        print(f"Epoch {epoch}, Loss: {loss.item()}")
+```
+
+
+
 # Saving and Loading Models in PyTorch
 
 This guide explains how to save and load models efficiently in PyTorch. It focuses on saving only the model's state dictionary (parameters and buffers) rather than the entire model, highlighting the reasons for this best practice.
